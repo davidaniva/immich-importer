@@ -1,13 +1,13 @@
 package state
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // JobState tracks the overall import job progress
@@ -42,12 +42,18 @@ type UploadState struct {
 // New creates a new JobState
 func New() *JobState {
 	return &JobState{
-		ID:        uuid.New().String(),
+		ID:        generateID(),
 		Status:    "idle",
 		Files:     []FileState{},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+}
+
+func generateID() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }
 
 // Load loads state from disk
