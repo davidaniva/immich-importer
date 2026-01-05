@@ -19,3 +19,6 @@ Thumbs.db
 *.dll
 *.so
 *.dylib
+test_zips/
+immich-importer
+*.zip

@@ -47,15 +47,17 @@ var scopes = []string{
 	"https://www.googleapis.com/auth/drive.readonly",
 }
 
+// Fixed port for OAuth callback - must match Google Cloud Console redirect URI
+const oauthCallbackPort = 8085
+
 // StartOAuth initiates the OAuth flow and returns the auth URL
 func StartOAuth(cfg config.OAuthConfig) (*Client, string, error) {
-	// Find an available port
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	// Use fixed port so redirect URI can be registered in Google Cloud Console
+	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", oauthCallbackPort))
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to start callback server: %w", err)
+		return nil, "", fmt.Errorf("failed to start callback server on port %d: %w", oauthCallbackPort, err)
 	}
-	port := listener.Addr().(*net.TCPAddr).Port
-	redirectURI := fmt.Sprintf("http://127.0.0.1:%d/callback", port)
+	redirectURI := fmt.Sprintf("http://127.0.0.1:%d/callback", oauthCallbackPort)
 
 	oauth2Config := &oauth2.Config{
 		ClientID:     cfg.ClientID,
