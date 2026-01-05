@@ -55,11 +55,8 @@ jobs:
           cd frontend
           npm install
 
-      - name: Generate Wails bindings
-        run: wails generate module
-
       - name: Build
-        run: wails build -platform ${{ matrix.platform }}
+        run: wails build -platform ${{ matrix.platform }} -debug 2>&1 || (echo "Build failed, checking Go compilation..." && go build -v ./... 2>&1 && exit 1)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
