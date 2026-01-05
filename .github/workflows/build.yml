@@ -13,14 +13,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-            platform: darwin/universal
-            artifact: immich-importer-darwin-universal
           - os: ubuntu-latest
-            platform: linux/amd64
+            goos: darwin
+            goarch: arm64
+            artifact: immich-importer-darwin-arm64
+          - os: ubuntu-latest
+            goos: darwin
+            goarch: amd64
+            artifact: immich-importer-darwin-amd64
+          - os: ubuntu-latest
+            goos: linux
+            goarch: amd64
             artifact: immich-importer-linux-amd64
-          - os: windows-latest
-            platform: windows/amd64
+          - os: ubuntu-latest
+            goos: windows
+            goarch: amd64
             artifact: immich-importer-windows-amd64.exe
     runs-on: ${{ matrix.os }}
 
@@ -33,36 +40,23 @@ jobs:
           go-version: '1.22'
           cache: false
 
-      - name: Generate go.sum and download modules
+      - name: Download modules
         run: go mod tidy
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Wails
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
-
-      - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
-
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
-
       - name: Build
-        run: wails build -platform ${{ matrix.platform }} -debug 2>&1 || (echo "Build failed, checking Go compilation..." && go build -v ./... 2>&1 && exit 1)
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          OUTPUT=${{ matrix.artifact }}
+          go build -ldflags="-s -w" -o $OUTPUT .
+          ls -la $OUTPUT
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: build/bin/*
+          path: ${{ matrix.artifact }}
 
   release:
     needs: build
