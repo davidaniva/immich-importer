@@ -55,6 +55,9 @@ jobs:
           cd frontend
           npm install
 
+      - name: Generate Wails bindings
+        run: wails generate module
+
       - name: Build
         run: wails build -platform ${{ matrix.platform }}
 
