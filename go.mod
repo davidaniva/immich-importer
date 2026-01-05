@@ -1,4 +1,4 @@
-module github.com/immich-app/immich-importer
+module github.com/davidaniva/immich-importer
 
 go 1.22
 

@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/immich-app/immich-importer/internal/config"
-	"github.com/immich-app/immich-importer/internal/google"
-	"github.com/immich-app/immich-importer/internal/state"
+	"github.com/davidaniva/immich-importer/internal/config"
+	"github.com/davidaniva/immich-importer/internal/google"
+	"github.com/davidaniva/immich-importer/internal/state"
 )
 
 // Downloader handles resumable file downloads from Google Drive

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/immich-app/immich-importer/internal/state"
+	"github.com/davidaniva/immich-importer/internal/state"
 )
 
 // Importer handles uploading photos to Immich

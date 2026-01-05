@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/immich-app/immich-importer/internal/config"
+	"github.com/davidaniva/immich-importer/internal/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/immich-app/immich-importer/internal/config"
-	"github.com/immich-app/immich-importer/internal/downloader"
-	"github.com/immich-app/immich-importer/internal/google"
-	"github.com/immich-app/immich-importer/internal/importer"
-	"github.com/immich-app/immich-importer/internal/state"
+	"github.com/davidaniva/immich-importer/internal/config"
+	"github.com/davidaniva/immich-importer/internal/downloader"
+	"github.com/davidaniva/immich-importer/internal/google"
+	"github.com/davidaniva/immich-importer/internal/importer"
+	"github.com/davidaniva/immich-importer/internal/state"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
