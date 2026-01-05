@@ -33,8 +33,8 @@ jobs:
           go-version: '1.22'
           cache: false
 
-      - name: Download Go modules
-        run: go mod download
+      - name: Generate go.sum and download modules
+        run: go mod tidy
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
