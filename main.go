@@ -36,8 +36,11 @@ func main() {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sigChan
-		fmt.Println("\nInterrupted. Saving state...")
+		fmt.Println("\nInterrupted. Saving state... (press Ctrl+C again to force quit)")
 		cancel()
+		<-sigChan
+		fmt.Println("\nForce quitting.")
+		os.Exit(1)
 	}()
 
 	// Try to load existing config

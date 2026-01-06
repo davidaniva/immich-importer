@@ -232,10 +232,10 @@ func (c *Client) DownloadFile(fileID string) (*http.Response, error) {
 }
 
 // DownloadFileRange downloads a file with Range header for resume
-func (c *Client) DownloadFileRange(fileID string, startByte int64) (*http.Response, error) {
-	url := fmt.Sprintf("https://www.googleapis.com/drive/v3/files/%s?alt=media", fileID)
+func (c *Client) DownloadFileRange(ctx context.Context, fileID string, startByte int64) (*http.Response, error) {
+	apiURL := fmt.Sprintf("https://www.googleapis.com/drive/v3/files/%s?alt=media", fileID)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
 		return nil, err
 	}

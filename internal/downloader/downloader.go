@@ -47,7 +47,7 @@ func (d *Downloader) DownloadFile(ctx context.Context, file *state.FileState) er
 	}
 
 	// Download with range header for resume
-	resp, err := d.google.DownloadFileRange(file.DriveID, startByte)
+	resp, err := d.google.DownloadFileRange(ctx, file.DriveID, startByte)
 	if err != nil {
 		return fmt.Errorf("failed to download: %w", err)
 	}
