@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/davidaniva/immich-importer/internal/config"
@@ -185,15 +186,15 @@ func (c *Client) ListTakeoutFiles() ([]DriveFile, error) {
 	pageToken := ""
 
 	for {
-		url := fmt.Sprintf(
+		apiURL := fmt.Sprintf(
 			"https://www.googleapis.com/drive/v3/files?q=%s&fields=files(id,name,size,mimeType)&pageSize=100",
-			query,
+			url.QueryEscape(query),
 		)
 		if pageToken != "" {
-			url += "&pageToken=" + pageToken
+			apiURL += "&pageToken=" + url.QueryEscape(pageToken)
 		}
 
-		req, err := http.NewRequest("GET", url, nil)
+		req, err := http.NewRequest("GET", apiURL, nil)
 		if err != nil {
 			return nil, err
 		}
