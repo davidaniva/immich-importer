@@ -156,7 +156,6 @@ func main() {
 		fmt.Printf("\nTotal: %.2f MB\n", float64(totalSize)/1024/1024)
 
 		fmt.Print("\nImport all files? [Y/n] (or enter specific numbers comma-separated): ")
-		reader := bufio.NewReader(os.Stdin)
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
