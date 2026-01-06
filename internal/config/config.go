@@ -44,7 +44,7 @@ func (c *Config) HasGoogleTokens() bool {
 
 // SetupTokenResponse is the response from POST /api/importer/setup-token
 type SetupTokenResponse struct {
-	SetupToken string `json:"setupToken"`
+	Token string `json:"token"`
 }
 
 // CreateSetupToken creates a setup token using an API key
@@ -73,7 +73,7 @@ func CreateSetupToken(serverURL, apiKey string) (string, error) {
 		return "", fmt.Errorf("failed to parse response: %w", err)
 	}
 
-	return result.SetupToken, nil
+	return result.Token, nil
 }
 
 // FetchFromServer fetches config from the Immich server
