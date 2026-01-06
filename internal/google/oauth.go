@@ -53,11 +53,12 @@ const oauthCallbackPort = 8085
 // StartOAuth initiates the OAuth flow and returns the auth URL
 func StartOAuth(cfg config.OAuthConfig) (*Client, string, error) {
 	// Use fixed port so redirect URI can be registered in Google Cloud Console
+	// Listen on 127.0.0.1 but use "localhost" in redirect URI (Google treats them differently)
 	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", oauthCallbackPort))
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to start callback server on port %d: %w", oauthCallbackPort, err)
 	}
-	redirectURI := fmt.Sprintf("http://127.0.0.1:%d/callback", oauthCallbackPort)
+	redirectURI := fmt.Sprintf("http://localhost:%d/callback", oauthCallbackPort)
 
 	oauth2Config := &oauth2.Config{
 		ClientID:     cfg.ClientID,
