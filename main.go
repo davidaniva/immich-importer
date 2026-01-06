@@ -85,7 +85,39 @@ func main() {
 	// Check Google auth
 	if !cfg.HasGoogleTokens() {
 		fmt.Println()
-		fmt.Println("Google account not connected. Starting OAuth flow...")
+		fmt.Println("=== STEP 1: Request Google Takeout Export ===")
+		fmt.Println()
+		fmt.Println("Before connecting your Google account, you need to request a Google Takeout")
+		fmt.Println("export of your photos. This tells Google to package your photos for download.")
+		fmt.Println()
+		fmt.Println("1. Open this link in your browser:")
+		fmt.Println("   https://takeout.google.com/settings/takeout/custom/photo")
+		fmt.Println()
+		fmt.Println("2. Configure export settings:")
+		fmt.Println("   - Frequency: Export once")
+		fmt.Println("   - File type: .zip")
+		fmt.Println("   - File size: Largest available (50GB)")
+		fmt.Println("   - Delivery method: Add to Drive")
+		fmt.Println()
+		fmt.Println("3. Click 'Create export' and wait for Google to prepare your files")
+		fmt.Println("   (This can take hours or days depending on library size)")
+		fmt.Println()
+		fmt.Println("4. You'll receive an email when the export is ready in your Drive")
+		fmt.Println()
+		fmt.Print("Have you already requested and received your Takeout export? [y/N]: ")
+		reader := bufio.NewReader(os.Stdin)
+		answer, _ := reader.ReadString('\n')
+		answer = strings.TrimSpace(strings.ToLower(answer))
+		if answer != "y" && answer != "yes" {
+			fmt.Println()
+			fmt.Println("Please complete the Takeout export first, then run this tool again.")
+			os.Exit(0)
+		}
+
+		fmt.Println()
+		fmt.Println("=== STEP 2: Connect Google Drive ===")
+		fmt.Println()
+		fmt.Println("Now connecting to your Google account to access the Takeout files...")
 		if err := doGoogleAuth(cfg); err != nil {
 			fmt.Printf("Error: Google authentication failed: %v\n", err)
 			os.Exit(1)
@@ -117,7 +149,14 @@ func main() {
 
 		if len(files) == 0 {
 			fmt.Println("No Takeout files found in your Google Drive.")
-			fmt.Println("Make sure you've created a Google Takeout export and it's saved to Drive.")
+			fmt.Println()
+			fmt.Println("Possible reasons:")
+			fmt.Println("  - The export is still being prepared (check your email for completion)")
+			fmt.Println("  - You selected 'Send download link via email' instead of 'Add to Drive'")
+			fmt.Println("  - The Takeout files are in a different Google account")
+			fmt.Println()
+			fmt.Println("To request a new export with Google Photos only:")
+			fmt.Println("  https://takeout.google.com/settings/takeout/custom/photo")
 			os.Exit(0)
 		}
 
