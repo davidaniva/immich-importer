@@ -122,7 +122,7 @@ func main() {
 		fmt.Println("Connecting your Google account...")
 		redirectURL := ""
 		if wantsTakeout {
-			redirectURL = "https://takeout.google.com/settings/takeout/custom/photo"
+			redirectURL = "https://takeout.google.com/settings/takeout/custom/photos"
 		}
 		if err := doGoogleAuthWithRedirect(cfg, redirectURL); err != nil {
 			fmt.Printf("Error: Google authentication failed: %v\n", err)
@@ -133,7 +133,7 @@ func main() {
 
 	// If user wanted Takeout, open browser and show instructions
 	if wantsTakeout {
-		takeoutURL := "https://takeout.google.com/settings/takeout/custom/photo"
+		takeoutURL := "https://takeout.google.com/settings/takeout/custom/photos"
 		fmt.Println()
 		fmt.Println("Opening Google Takeout...")
 		if err := openBrowser(takeoutURL); err != nil {
@@ -174,7 +174,7 @@ func main() {
 			fmt.Println("  - The Takeout files are in a different Google account")
 			fmt.Println()
 			fmt.Println("To request a new export with Google Photos only:")
-			fmt.Println("  https://takeout.google.com/settings/takeout/custom/photo")
+			fmt.Println("  https://takeout.google.com/settings/takeout/custom/photos")
 			os.Exit(0)
 		}
 
