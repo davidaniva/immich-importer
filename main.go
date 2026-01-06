@@ -161,18 +161,24 @@ func main() {
 		}
 
 		fmt.Printf("\nFound %d Takeout file(s):\n", len(files))
+		var totalSize int64
 		for i, f := range files {
 			fmt.Printf("  [%d] %s (%.2f MB)\n", i+1, f.Name, float64(f.Size)/1024/1024)
+			totalSize += f.Size
 		}
+		fmt.Printf("\nTotal: %.2f MB\n", float64(totalSize)/1024/1024)
 
-		fmt.Print("\nEnter file numbers to import (comma-separated, or 'all'): ")
+		fmt.Print("\nImport all files? [Y/n] (or enter specific numbers comma-separated): ")
 		reader := bufio.NewReader(os.Stdin)
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
 		var selectedFiles []google.DriveFile
-		if strings.ToLower(input) == "all" {
+		if input == "" || strings.ToLower(input) == "y" || strings.ToLower(input) == "yes" || strings.ToLower(input) == "all" {
 			selectedFiles = files
+		} else if strings.ToLower(input) == "n" || strings.ToLower(input) == "no" {
+			fmt.Println("Cancelled.")
+			os.Exit(0)
 		} else {
 			for _, numStr := range strings.Split(input, ",") {
 				numStr = strings.TrimSpace(numStr)

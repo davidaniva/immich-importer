@@ -179,8 +179,8 @@ func NewClientFromTokens(cfg config.OAuthConfig, accessToken, refreshToken strin
 
 // ListTakeoutFiles lists Google Takeout files in Drive
 func (c *Client) ListTakeoutFiles() ([]DriveFile, error) {
-	// Search for Takeout files - they're usually named "takeout-*.zip" or in a "Takeout" folder
-	query := "(name contains 'takeout' and mimeType = 'application/zip') or (name contains 'Takeout' and mimeType = 'application/vnd.google-apps.folder')"
+	// Search for Takeout zip files only (not folders)
+	query := "name contains 'takeout' and mimeType = 'application/zip'"
 
 	var allFiles []DriveFile
 	pageToken := ""
