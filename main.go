@@ -131,8 +131,14 @@ func main() {
 		fmt.Println("Google account connected!")
 	}
 
-	// If user wanted Takeout, show instructions and exit
+	// If user wanted Takeout, open browser and show instructions
 	if wantsTakeout {
+		takeoutURL := "https://takeout.google.com/settings/takeout/custom/photo"
+		fmt.Println()
+		fmt.Println("Opening Google Takeout...")
+		if err := openBrowser(takeoutURL); err != nil {
+			fmt.Printf("Could not open browser. Please open: %s\n", takeoutURL)
+		}
 		showTakeoutInstructions()
 		os.Exit(0)
 	}
