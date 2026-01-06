@@ -6,7 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -230,8 +232,12 @@ func doGoogleAuth(cfg *config.Config) error {
 	}
 
 	fmt.Println()
-	fmt.Println("Please open this URL in your browser:")
-	fmt.Println(authURL)
+	fmt.Println("Opening browser for Google authorization...")
+	if err := openBrowser(authURL); err != nil {
+		fmt.Println("Could not open browser automatically.")
+		fmt.Println("Please open this URL manually:")
+		fmt.Println(authURL)
+	}
 	fmt.Println()
 	fmt.Println("Waiting for authorization callback...")
 
@@ -314,6 +320,28 @@ func truncate(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen-3] + "..."
+}
+
+func openBrowser(url string) error {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", "", url)
+	default: // Linux and others
+		// Try common browsers/openers
+		for _, opener := range []string{"xdg-open", "sensible-browser", "x-www-browser", "gnome-open"} {
+			if path, err := exec.LookPath(opener); err == nil {
+				cmd = exec.Command(path, url)
+				break
+			}
+		}
+	}
+	if cmd == nil {
+		return fmt.Errorf("no browser opener found")
+	}
+	return cmd.Start()
 }
 
 func showTakeoutInstructions() {
