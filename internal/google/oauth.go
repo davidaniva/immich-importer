@@ -21,6 +21,12 @@ type Client struct {
 	httpClient   *http.Client
 	callbackChan chan string
 	listener     net.Listener
+	redirectURL  string
+}
+
+// SetRedirectAfterAuth sets a URL to redirect to after successful auth
+func (c *Client) SetRedirectAfterAuth(url string) {
+	c.redirectURL = url
 }
 
 // Tokens holds OAuth token information
@@ -99,9 +105,20 @@ func (c *Client) startCallbackServer() {
 		// Send code to channel
 		c.callbackChan <- code
 
-		// Show success page
+		// Show success page with optional redirect
 		w.Header().Set("Content-Type", "text/html")
-		fmt.Fprintf(w, `<!DOCTYPE html>
+		if c.redirectURL != "" {
+			fmt.Fprintf(w, `<!DOCTYPE html>
+<html>
+<head><title>Success</title></head>
+<body style="font-family: sans-serif; text-align: center; padding: 50px;">
+  <h1>Authentication Successful</h1>
+  <p>Redirecting to Google Takeout...</p>
+  <script>window.location.href = %q;</script>
+</body>
+</html>`, c.redirectURL)
+		} else {
+			fmt.Fprintf(w, `<!DOCTYPE html>
 <html>
 <head><title>Success</title></head>
 <body style="font-family: sans-serif; text-align: center; padding: 50px;">
@@ -110,6 +127,7 @@ func (c *Client) startCallbackServer() {
   <script>window.close();</script>
 </body>
 </html>`)
+		}
 	})
 
 	http.Serve(c.listener, mux)
