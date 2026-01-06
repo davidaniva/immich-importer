@@ -88,39 +88,9 @@ func main() {
 	// Check Google auth
 	if !cfg.HasGoogleTokens() {
 		fmt.Println()
-		fmt.Println("=== STEP 1: Request Google Takeout Export ===")
+		fmt.Println("=== Connect Google Drive ===")
 		fmt.Println()
-		fmt.Println("Before connecting your Google account, you need to request a Google Takeout")
-		fmt.Println("export of your photos. This tells Google to package your photos for download.")
-		fmt.Println()
-		fmt.Println("1. Open this link in your browser:")
-		fmt.Println("   https://takeout.google.com/settings/takeout/custom/photo")
-		fmt.Println()
-		fmt.Println("2. Configure export settings:")
-		fmt.Println("   - Frequency: Export once")
-		fmt.Println("   - File type: .zip")
-		fmt.Println("   - File size: Largest available (50GB)")
-		fmt.Println("   - Delivery method: Add to Drive")
-		fmt.Println()
-		fmt.Println("3. Click 'Create export' and wait for Google to prepare your files")
-		fmt.Println("   (This can take hours or days depending on library size)")
-		fmt.Println()
-		fmt.Println("4. You'll receive an email when the export is ready in your Drive")
-		fmt.Println()
-		fmt.Print("Have you already requested and received your Takeout export? [y/N]: ")
-		reader := bufio.NewReader(os.Stdin)
-		answer, _ := reader.ReadString('\n')
-		answer = strings.TrimSpace(strings.ToLower(answer))
-		if answer != "y" && answer != "yes" {
-			fmt.Println()
-			fmt.Println("Please complete the Takeout export first, then run this tool again.")
-			os.Exit(0)
-		}
-
-		fmt.Println()
-		fmt.Println("=== STEP 2: Connect Google Drive ===")
-		fmt.Println()
-		fmt.Println("Now connecting to your Google account to access the Takeout files...")
+		fmt.Println("First, let's connect your Google account...")
 		if err := doGoogleAuth(cfg); err != nil {
 			fmt.Printf("Error: Google authentication failed: %v\n", err)
 			os.Exit(1)
@@ -140,8 +110,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	// If no existing job, list files and let user select
+	// If no existing job, offer to request new export or import existing
 	if jobState == nil || len(jobState.Files) == 0 {
+		fmt.Println()
+		fmt.Println("What would you like to do?")
+		fmt.Println("  [1] Request a new Google Takeout export")
+		fmt.Println("  [2] Import existing Takeout files from Drive")
+		fmt.Println()
+		fmt.Print("Choice [1/2]: ")
+		reader := bufio.NewReader(os.Stdin)
+		choice, _ := reader.ReadString('\n')
+		choice = strings.TrimSpace(choice)
+
+		if choice == "1" || choice == "" {
+			showTakeoutInstructions()
+			os.Exit(0)
+		}
 		fmt.Println()
 		fmt.Println("Searching for Google Takeout files in your Drive...")
 		files, err := googleClient.ListTakeoutFiles()
@@ -319,4 +303,27 @@ func truncate(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen-3] + "..."
+}
+
+func showTakeoutInstructions() {
+	fmt.Println()
+	fmt.Println("=== Request Google Takeout Export ===")
+	fmt.Println()
+	fmt.Println("1. Open this link in your browser:")
+	fmt.Println()
+	fmt.Println("   https://takeout.google.com/settings/takeout/custom/photo")
+	fmt.Println()
+	fmt.Println("2. Configure export settings:")
+	fmt.Println("   - Frequency: Export once")
+	fmt.Println("   - File type: .zip")
+	fmt.Println("   - File size: 50 GB (largest available)")
+	fmt.Println("   - Delivery method: Add to Drive")
+	fmt.Println()
+	fmt.Println("3. Click 'Create export'")
+	fmt.Println()
+	fmt.Println("4. Wait for Google to prepare your files (can take hours for large libraries)")
+	fmt.Println("   You'll receive an email when the export is ready.")
+	fmt.Println()
+	fmt.Println("5. Run this tool again and choose option [2] to import.")
+	fmt.Println()
 }
