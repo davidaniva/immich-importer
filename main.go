@@ -345,24 +345,25 @@ func openBrowser(url string) error {
 }
 
 func showTakeoutInstructions() {
+	takeoutURL := "https://takeout.google.com/settings/takeout/custom/photo"
+
 	fmt.Println()
 	fmt.Println("=== Request Google Takeout Export ===")
 	fmt.Println()
-	fmt.Println("1. Open this link in your browser:")
+	fmt.Println("Opening Google Takeout in your browser...")
+	if err := openBrowser(takeoutURL); err != nil {
+		fmt.Println("Could not open browser. Please open manually:")
+		fmt.Println("   " + takeoutURL)
+	}
 	fmt.Println()
-	fmt.Println("   https://takeout.google.com/settings/takeout/custom/photo")
-	fmt.Println()
-	fmt.Println("2. Configure export settings:")
+	fmt.Println("Configure these export settings:")
 	fmt.Println("   - Frequency: Export once")
 	fmt.Println("   - File type: .zip")
 	fmt.Println("   - File size: 50 GB (largest available)")
 	fmt.Println("   - Delivery method: Add to Drive")
 	fmt.Println()
-	fmt.Println("3. Click 'Create export'")
+	fmt.Println("Then click 'Create export' and wait for the email from Google.")
 	fmt.Println()
-	fmt.Println("4. Wait for Google to prepare your files (can take hours for large libraries)")
-	fmt.Println("   You'll receive an email when the export is ready.")
-	fmt.Println()
-	fmt.Println("5. Run this tool again and choose option [2] to import.")
+	fmt.Println("Once ready, run this tool again and choose option [2] to import.")
 	fmt.Println()
 }
