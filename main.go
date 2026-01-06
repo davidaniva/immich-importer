@@ -330,11 +330,16 @@ func openBrowser(url string) error {
 	case "windows":
 		cmd = exec.Command("cmd", "/c", "start", "", url)
 	default: // Linux and others
-		// Try common browsers/openers
-		for _, opener := range []string{"xdg-open", "sensible-browser", "x-www-browser", "gnome-open"} {
-			if path, err := exec.LookPath(opener); err == nil {
-				cmd = exec.Command(path, url)
-				break
+		// Check if running in WSL (Windows Subsystem for Linux)
+		if isWSL() {
+			cmd = exec.Command("cmd.exe", "/c", "start", "", url)
+		} else {
+			// Try common browsers/openers
+			for _, opener := range []string{"xdg-open", "sensible-browser", "x-www-browser", "gnome-open"} {
+				if path, err := exec.LookPath(opener); err == nil {
+					cmd = exec.Command(path, url)
+					break
+				}
 			}
 		}
 	}
@@ -344,25 +349,29 @@ func openBrowser(url string) error {
 	return cmd.Start()
 }
 
+func isWSL() bool {
+	data, err := os.ReadFile("/proc/version")
+	if err != nil {
+		return false
+	}
+	return strings.Contains(strings.ToLower(string(data)), "microsoft")
+}
+
 func showTakeoutInstructions() {
 	takeoutURL := "https://takeout.google.com/settings/takeout/custom/photo"
 
 	fmt.Println()
 	fmt.Println("=== Request Google Takeout Export ===")
 	fmt.Println()
-	fmt.Println("Opening Google Takeout in your browser...")
-	if err := openBrowser(takeoutURL); err != nil {
-		fmt.Println("Could not open browser. Please open manually:")
-		fmt.Println("   " + takeoutURL)
-	}
+	fmt.Printf("1. Open: \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\\n", takeoutURL, takeoutURL)
 	fmt.Println()
-	fmt.Println("Configure these export settings:")
+	fmt.Println("2. Configure export settings:")
 	fmt.Println("   - Frequency: Export once")
 	fmt.Println("   - File type: .zip")
 	fmt.Println("   - File size: 50 GB (largest available)")
 	fmt.Println("   - Delivery method: Add to Drive")
 	fmt.Println()
-	fmt.Println("Then click 'Create export' and wait for the email from Google.")
+	fmt.Println("3. Click 'Create export' and wait for the email from Google.")
 	fmt.Println()
 	fmt.Println("Once ready, run this tool again and choose option [2] to import.")
 	fmt.Println()
