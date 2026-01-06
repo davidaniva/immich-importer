@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/davidaniva/immich-importer/internal/config"
 	"github.com/davidaniva/immich-importer/internal/downloader"
@@ -189,11 +190,15 @@ func doGoogleAuth(cfg *config.Config) error {
 	fmt.Println("Please open this URL in your browser:")
 	fmt.Println(authURL)
 	fmt.Println()
-	fmt.Print("After authorizing, paste the code here: ")
+	fmt.Println("Waiting for authorization callback...")
 
-	reader := bufio.NewReader(os.Stdin)
-	code, _ := reader.ReadString('\n')
-	code = strings.TrimSpace(code)
+	// Wait for the OAuth callback (5 minute timeout)
+	code, err := client.WaitForCallback(5 * time.Minute)
+	if err != nil {
+		return fmt.Errorf("OAuth callback failed: %w", err)
+	}
+
+	fmt.Println("Authorization received, exchanging code...")
 
 	if err := client.ExchangeCode(code); err != nil {
 		return err
