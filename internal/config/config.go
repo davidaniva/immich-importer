@@ -42,6 +42,40 @@ func (c *Config) HasGoogleTokens() bool {
 	return c.GoogleAccessToken != "" && c.GoogleRefreshToken != ""
 }
 
+// SetupTokenResponse is the response from POST /api/importer/setup-token
+type SetupTokenResponse struct {
+	SetupToken string `json:"setupToken"`
+}
+
+// CreateSetupToken creates a setup token using an API key
+func CreateSetupToken(serverURL, apiKey string) (string, error) {
+	url := fmt.Sprintf("%s/api/importer/setup-token", serverURL)
+
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("x-api-key", apiKey)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to connect to server: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("server returned %d: %s", resp.StatusCode, string(body))
+	}
+
+	var result SetupTokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	return result.SetupToken, nil
+}
+
 // FetchFromServer fetches config from the Immich server
 func FetchFromServer(serverURL, token string) (*Config, error) {
 	url := fmt.Sprintf("%s/api/importer/config/%s", serverURL, token)

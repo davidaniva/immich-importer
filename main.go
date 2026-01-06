@@ -21,7 +21,7 @@ import (
 
 func main() {
 	serverURL := flag.String("server", "", "Immich server URL")
-	setupToken := flag.String("token", "", "Setup token from Immich")
+	apiKey := flag.String("api-key", "", "Immich API key")
 	flag.Parse()
 
 	fmt.Println("Immich Google Photos Importer")
@@ -51,14 +51,26 @@ func main() {
 
 	// If no config, need to set up
 	if cfg == nil {
-		if *serverURL == "" || *setupToken == "" {
+		if *serverURL == "" || *apiKey == "" {
 			fmt.Println("No existing configuration found.")
-			fmt.Println("Please provide --server and --token flags, or run the bootstrap binary.")
+			fmt.Println("Usage: immich-importer --server URL --api-key KEY")
+			fmt.Println()
+			fmt.Println("Get your API key from Immich: User Settings > API Keys > New API Key")
 			os.Exit(1)
 		}
 
-		fmt.Printf("Fetching configuration from %s...\n", *serverURL)
-		cfg, err = config.FetchFromServer(*serverURL, *setupToken)
+		fmt.Printf("Connecting to %s...\n", *serverURL)
+
+		// Create setup token using API key
+		fmt.Println("Creating setup token...")
+		setupToken, err := config.CreateSetupToken(*serverURL, *apiKey)
+		if err != nil {
+			fmt.Printf("Error: Failed to create setup token: %v\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Fetching configuration...")
+		cfg, err = config.FetchFromServer(*serverURL, setupToken)
 		if err != nil {
 			fmt.Printf("Error: Failed to fetch config: %v\n", err)
 			os.Exit(1)
